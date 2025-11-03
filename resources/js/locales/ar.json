@@ -1,0 +1,15 @@
+{
+    "dashboard": {
+        "title": "لوحة التحكم",
+        "welcome": "مرحباً بعودتك! راقب أمان شبكتك في الوقت الفعلي.",
+        "total_alerts": "إجمالي التنبيهات",
+        "network_logs": "سجلات الشبكة",
+        "active_models": "النماذج النشطة",
+        "critical_threats": "التهديدات الحرجة",
+        "alerts_over_time": "التنبيهات عبر الوقت",
+        "severity_distribution": "توزيع الخطورة",
+        "recent_security_alerts": "أحدث التنبيهات الأمنية",
+        "system_status": "حالة النظام",
+        "no_recent_alerts": "لا توجد تنبيهات حديثة"
+    }
+}

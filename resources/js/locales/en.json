@@ -1,0 +1,15 @@
+{
+    "dashboard": {
+        "title": "Dashboard",
+        "welcome": "Welcome back! Monitor your network security in real-time.",
+        "total_alerts": "Total Alerts",
+        "network_logs": "Network Logs",
+        "active_models": "Active Models",
+        "critical_threats": "Critical Threats",
+        "alerts_over_time": "Alerts Over Time",
+        "severity_distribution": "Severity Distribution",
+        "recent_security_alerts": "Recent Security Alerts",
+        "system_status": "System Status",
+        "no_recent_alerts": "No recent alerts"
+    }
+}
