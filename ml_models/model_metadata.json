@@ -1,0 +1,33 @@
+{
+  "training_date": "2025-11-05T02:59:42.330266",
+  "model_type": "RandomForestClassifier",
+  "accuracy": 0.9915,
+  "n_features": 20,
+  "classes": [
+    "attack",
+    "normal"
+  ],
+  "n_samples": 10000,
+  "feature_names": [
+    "feature_0",
+    "feature_1",
+    "feature_2",
+    "feature_3",
+    "feature_4",
+    "feature_5",
+    "feature_6",
+    "feature_7",
+    "feature_8",
+    "feature_9",
+    "feature_10",
+    "feature_11",
+    "feature_12",
+    "feature_13",
+    "feature_14",
+    "feature_15",
+    "feature_16",
+    "feature_17",
+    "feature_18",
+    "feature_19"
+  ]
+}

@@ -18,6 +18,23 @@ const setLocale = (newLocale) => {
 
 const showingNavigationDropdown = ref(false);
 const sidebarOpen = ref(false);
+
+// Load sidebar state from localStorage
+const sidebarCollapsed = ref(false);
+
+onMounted(() => {
+    // Restore sidebar state from localStorage
+    const savedState = localStorage.getItem('sidebarCollapsed');
+    if (savedState !== null) {
+        sidebarCollapsed.value = savedState === 'true';
+    }
+});
+
+// Watch for changes and save to localStorage
+watch(sidebarCollapsed, (newValue) => {
+    localStorage.setItem('sidebarCollapsed', String(newValue));
+});
+
 const page = usePage();
 
 // Theme management مع SSR safety
@@ -55,8 +72,7 @@ const sidebarMenuItems = ref([
         href: '/live-monitoring',
         icon: 'live',
         active: 'live-monitoring*',
-        description: 'Real-time packet capture',
-        badge: 'NEW'
+        description: 'Real-time packet capture'
     },
     {
         name: 'Alerts',
@@ -64,6 +80,20 @@ const sidebarMenuItems = ref([
         icon: 'alerts',
         active: 'alerts*',
         description: 'Security alerts and threats'
+    },
+    {
+        name: 'Rules',
+        href: '/rules',
+        icon: 'rules',
+        active: 'rules*',
+        description: 'Snort detection rules'
+    },
+    {
+        name: 'Investigations',
+        href: '/investigations',
+        icon: 'investigations',
+        active: 'investigations*',
+        description: 'Case management'
     },
     {
         name: 'ML Models',
@@ -97,7 +127,7 @@ const sidebarMenuItems = ref([
     {
         name: 'System Health',
         href: '/system-health',
-        icon: 'settings',
+        icon: 'health',
         active: 'system-health*',
         description: 'System health monitoring',
         adminOnly: true
@@ -156,10 +186,13 @@ const getIconPath = (iconName) => {
         logs: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
         live: "M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z",
         alerts: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.864-.833-2.634 0L4.18 16.5c-.77.833.192 2.5 1.732 2.5z",
+        rules: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
+        investigations: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z",
         models: "M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
         analytics: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
         notifications: "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9",
         users: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-.5a4 4 0 11-8 0 4 4 0 018 0z",
+        health: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z",
         settings: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z"
     };
     return iconPaths[iconName] || iconPaths.dashboard;
@@ -350,22 +383,37 @@ onMounted(() => {
         <div 
             id="sidebar"
             :class="[
-                'fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0',
+                'fixed inset-y-0 left-0 z-50 bg-white dark:bg-gray-800 shadow-lg transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0',
+                sidebarCollapsed ? 'w-20' : 'w-64',
                 sidebarOpen ? 'translate-x-0' : '-translate-x-full'
             ]"
         >
             <!-- Sidebar Header -->
             <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-                <!-- Logo مع صورة حقيقية -->
-                <Link href="/dashboard" class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                        <span class="text-white font-bold text-lg">AI</span>
-                    </div>
-                    <div class="hidden lg:block">
-                        <h1 class="text-xl font-bold text-gray-900 dark:text-white">AI-IDS</h1>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Security Platform</p>
-                    </div>
-                </Link>
+                <div class="flex items-center space-x-3 flex-1 min-w-0">
+                    <!-- Logo -->
+                    <Link href="/dashboard" class="flex items-center space-x-3 flex-1 min-w-0">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <span class="text-white font-bold text-lg">AI</span>
+                        </div>
+                        <div v-if="!sidebarCollapsed" class="hidden lg:block">
+                            <h1 class="text-xl font-bold text-gray-900 dark:text-white">AI-IDS</h1>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Security Platform</p>
+                        </div>
+                    </Link>
+                    
+                    <!-- Toggle button for desktop -->
+                    <button 
+                        @click="sidebarCollapsed = !sidebarCollapsed"
+                        class="hidden lg:block p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        title="Toggle sidebar"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path v-if="!sidebarCollapsed" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
                 
                 <!-- Close button for mobile -->
                 <button 
@@ -379,9 +427,9 @@ onMounted(() => {
             </div>
             
             <!-- User Profile Section -->
-            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div v-if="!sidebarCollapsed" class="p-6 border-b border-gray-200 dark:border-gray-700">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
                         <span class="text-sm font-semibold text-white">
                             {{ user?.name?.charAt(0).toUpperCase() || 'U' }}
                         </span>
@@ -396,6 +444,13 @@ onMounted(() => {
                     </div>
                 </div>
             </div>
+            <div v-else class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-center">
+                <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <span class="text-sm font-semibold text-white">
+                        {{ user?.name?.charAt(0).toUpperCase() || 'U' }}
+                    </span>
+                </div>
+            </div>
             
             <!-- Navigation Menu -->
             <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
@@ -404,16 +459,19 @@ onMounted(() => {
                     :key="item.name"
                     :href="item.href"
                     :class="[
-                        'group flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200',
+                        'group flex items-center rounded-lg text-sm font-medium transition-all duration-200',
+                        sidebarCollapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3',
                         isActive(item.active) 
                             ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 border-r-2 border-blue-500' 
                             : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
                     ]"
+                    :title="sidebarCollapsed ? item.name : ''"
                     @click="sidebarOpen = false"
                 >
                     <svg 
-                        class="mr-4 h-5 w-5 flex-shrink-0" 
                         :class="[
+                            'h-5 w-5 flex-shrink-0',
+                            sidebarCollapsed ? '' : 'mr-4',
                             isActive(item.active) 
                                 ? 'text-blue-500 dark:text-blue-400' 
                                 : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300'
@@ -429,23 +487,29 @@ onMounted(() => {
                             :d="getIconPath(item.icon)"
                         />
                     </svg>
-                    <div class="flex-1 min-w-0">
+                    <div v-if="!sidebarCollapsed" class="flex-1 min-w-0">
                         <span class="truncate">{{ item.name }}</span>
                         <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
                             {{ item.description }}
                         </p>
                     </div>
+                    <span v-if="item.badge && !sidebarCollapsed" class="ml-auto px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full">
+                        {{ item.badge }}
+                    </span>
                 </Link>
             </nav>
             
             <!-- Sidebar Footer -->
             <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-                <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                <div v-if="!sidebarCollapsed" class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                     <span>AI-IDS v1.0</span>
                     <div class="flex items-center space-x-1">
                         <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                         <span>Online</span>
                     </div>
+                </div>
+                <div v-else class="flex justify-center">
+                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                 </div>
             </div>
         </div>

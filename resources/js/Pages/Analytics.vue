@@ -295,98 +295,70 @@ const isDebugMode = computed(() => {
             </div>
         </div>
 
-        <!-- Analytics Header -->
-        <div class="mb-8">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                        📊 Analytics Dashboard
-                    </h1>
-                    <p class="text-gray-600 dark:text-gray-400">
-                        Comprehensive analysis of your network security data and trends.
-                    </p>
-                </div>
-                
-                                    <div class="flex items-center space-x-3">
-                                        <select 
-                                            v-model="selectedPeriod"
-                                            :disabled="isLoading"
-                                            class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                                        >
-                                            <option 
-                                                v-for="option in periodOptions" 
-                                                :key="option.value" 
-                                                :value="option.value"
-                                            >
-                                                {{ option.label }}
-                                            </option>
-                                        </select>
-                                                        <div v-if="feature('export')" class="relative inline-block text-left">
-                            <div>
-                                <button @click="isExportMenuOpen = !isExportMenuOpen" type="button" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white text-sm font-medium rounded-lg shadow-sm transition-colors" id="menu-button" aria-expanded="true" aria-haspopup="true">
-                                    <svg v-if="isLoading" class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    <svg v-else class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                                    </svg>
-                                    {{ isLoading ? 'Loading...' : 'Export Report' }}
-                                    <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <div v-if="isExportMenuOpen" @click="isExportMenuOpen = false" class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
-                                <div class="py-1" role="none">
-                                    <a href="#" @click.prevent="exportReport('csv')" class="text-gray-700 dark:text-gray-200 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0">Export as CSV</a>
-                                    <a href="#" @click.prevent="exportReport('json')" class="text-gray-700 dark:text-gray-200 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-1">Export as JSON</a>
+        <div class="py-6">
+            <div class="max-w-7xl mx-auto px-6">
+                <!-- Header -->
+                <div class="mb-6 flex justify-between items-start">
+                    <div>
+                        <h1 class="text-2xl font-bold dark:text-white">📊 Analytics & Reports</h1>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Comprehensive analysis of network security data and trends</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <select 
+                            v-model="selectedPeriod"
+                            @change="handlePeriodChange"
+                            :disabled="isLoading"
+                            class="px-4 py-2 border dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                        >
+                            <option v-for="option in periodOptions" :key="option.value" :value="option.value">
+                                {{ option.label }}
+                            </option>
+                        </select>
+                        <div v-if="feature('export')" class="relative">
+                            <button @click="toggleExportMenu" :disabled="isLoading" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2 disabled:opacity-50">
+                                <svg v-if="!isLoading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <svg v-else class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                {{ isLoading ? 'Exporting...' : 'Export' }}
+                            </button>
+                            <div v-if="isExportMenuOpen" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg z-10 border dark:border-gray-600">
+                                <div class="py-1">
+                                    <button @click="exportReport('csv')" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-white flex items-center gap-2">
+                                        <span>📋</span> Export as CSV
+                                    </button>
+                                    <button @click="exportReport('json')" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-white flex items-center gap-2">
+                                        <span>🔗</span> Export as JSON
+                                    </button>
                                 </div>
                             </div>
-                        </div>                                    </div>            </div>
-        </div>
-
-        <!-- Summary Statistics -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div 
-                v-for="stat in summaryStats" 
-                :key="stat.name"
-                class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow duration-200"
-            >
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ stat.name }}</p>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stat.value }}</p>
-                    </div>
-                    <div :class="['w-12 h-12 rounded-lg flex items-center justify-center', stat.color]">
-                        <span class="text-2xl">{{ stat.icon }}</span>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="mt-4 flex items-center">
-                    <span 
-                        :class="[
-                            'inline-flex items-center text-xs font-medium',
-                            stat.changeType === 'increase' ? 'text-green-600 dark:text-green-400' :
-                            stat.changeType === 'decrease' ? 'text-red-600 dark:text-red-400' :
-                            'text-gray-600 dark:text-gray-400'
-                        ]"
+
+                <!-- Summary Stats Cards -->
+                <div class="grid grid-cols-4 gap-4 mb-6">
+                    <div 
+                        v-for="stat in summaryStats" 
+                        :key="stat.name"
+                        class="bg-white dark:bg-gray-800 rounded-lg p-4 border dark:border-gray-700"
                     >
-                        <svg v-if="stat.changeType === 'increase'" class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        <svg v-else-if="stat.changeType === 'decrease'" class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 112 0v11.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        {{ stat.change }}
-                    </span>
-                    <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">vs last period</span>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ stat.name }}</p>
+                        <p class="text-2xl font-bold dark:text-white">{{ stat.value }}</p>
+                        <div class="mt-2 flex items-center text-xs">
+                            <span :class="stat.changeType === 'increase' ? 'text-green-600' : stat.changeType === 'decrease' ? 'text-red-600' : 'text-gray-600'">
+                                {{ stat.change }}
+                            </span>
+                            <span class="text-gray-500 ml-2">vs last period</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Analytics Tabs -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <!-- Analytics Tabs -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow">
             <!-- Tab Navigation -->
             <div class="border-b border-gray-200 dark:border-gray-700">
                 <nav class="flex space-x-8 px-6" aria-label="Analytics tabs">
@@ -608,21 +580,22 @@ const isDebugMode = computed(() => {
             </div>
         </div>
 
-        <!-- Debug Info -->
-        <div v-if="isDebugMode" class="mt-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-            <h4 class="font-semibold mb-2 text-gray-900 dark:text-white">🔧 Debug Info:</h4>
-            <div class="grid grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
-                <div>
-                    <p><strong>Active Tab:</strong> {{ activeTab }}</p>
-                    <p><strong>Tab Key:</strong> {{ tabKey }}</p>
-                    <p><strong>Is Loading:</strong> {{ isLoading }}</p>
-                    <p><strong>Last Error:</strong> {{ lastError || 'None' }}</p>
-                </div>
-                <div>
-                    <p><strong>Has Alerts Data:</strong> {{ hasAlertsData }}</p>
-                    <p><strong>Has Network Data:</strong> {{ hasNetworkData }}</p>
-                    <p><strong>Has Threat Data:</strong> {{ hasThreatData }}</p>
-                    <p><strong>PieChart Status:</strong> ❌ Disabled (using alternative)</p>
+                <!-- Debug Info -->
+                <div v-if="isDebugMode" class="mt-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                    <h4 class="font-semibold mb-2 text-gray-900 dark:text-white">🔧 Debug Info:</h4>
+                    <div class="grid grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
+                        <div>
+                            <p><strong>Active Tab:</strong> {{ activeTab }}</p>
+                            <p><strong>Tab Key:</strong> {{ tabKey }}</p>
+                            <p><strong>Is Loading:</strong> {{ isLoading }}</p>
+                            <p><strong>Last Error:</strong> {{ lastError || 'None' }}</p>
+                        </div>
+                        <div>
+                            <p><strong>Has Alerts Data:</strong> {{ hasAlertsData }}</p>
+                            <p><strong>Has Network Data:</strong> {{ hasNetworkData }}</p>
+                            <p><strong>Has Threat Data:</strong> {{ hasThreatData }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

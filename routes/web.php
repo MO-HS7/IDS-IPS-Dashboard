@@ -12,6 +12,8 @@ use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\LiveMonitoringController;
+use App\Http\Controllers\RuleController;
+use App\Http\Controllers\InvestigationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -99,6 +101,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('network-logs', NetworkLogController::class)->except(['store']);
         Route::get('network-logs/{networkLog}/view', [NetworkLogController::class, 'showLog'])->name('network-logs.view');
         Route::resource('alerts', AlertController::class);
+        
+        // Rules Management Routes
+        Route::resource('rules', RuleController::class);
+        Route::post('rules/{rule}/toggle', [RuleController::class, 'toggle'])->name('rules.toggle');
+        Route::post('rules/import', [RuleController::class, 'import'])->name('rules.import');
+        Route::get('rules/export', [RuleController::class, 'export'])->name('rules.export');
+        
+        // Investigation Management Routes
+        Route::resource('investigations', InvestigationController::class);
+        Route::post('investigations/{investigation}/add-alert', [InvestigationController::class, 'addAlert'])->name('investigations.add-alert');
+        Route::delete('investigations/{investigation}/alerts/{alert}', [InvestigationController::class, 'removeAlert'])->name('investigations.remove-alert');
         
         // Live Monitoring Routes
         Route::get('live-monitoring', [LiveMonitoringController::class, 'index'])->name('live-monitoring.index');

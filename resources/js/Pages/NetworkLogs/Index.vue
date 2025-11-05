@@ -1,11 +1,19 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 const props = defineProps({
     networkLogs: Object,
 });
+
+const statistics = computed(() => ({
+    total: props.networkLogs?.total || 0,
+    processed: props.networkLogs?.data?.filter(log => log.status === 'processed').length || 0,
+    processing: props.networkLogs?.data?.filter(log => log.status === 'processing').length || 0,
+    pending: props.networkLogs?.data?.filter(log => log.status === 'pending').length || 0,
+    failed: props.networkLogs?.data?.filter(log => log.status === 'failed').length || 0,
+}));
 
 const deletingId = ref(null);
 
@@ -102,23 +110,48 @@ const retryProcessing = (id) => {
     <Head title="Network Logs" />
 
     <AuthenticatedLayout>
-        <template #header>
-            <div class="flex justify-between items-center">
-                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                    Network Logs
-                </h2>
-                <Link
-                    :href="route('network-logs.create')"
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                    Upload New Log
-                </Link>
-            </div>
-        </template>
+        <div class="py-6">
+            <div class="max-w-7xl mx-auto px-6">
+                <!-- Header -->
+                <div class="mb-6 flex justify-between items-start">
+                    <div>
+                        <h1 class="text-2xl font-bold dark:text-white">📁 Network Logs</h1>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Upload and manage network traffic captures</p>
+                    </div>
+                    <Link :href="route('network-logs.create')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                        </svg>
+                        Upload New Log
+                    </Link>
+                </div>
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-5 gap-4 mb-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border dark:border-gray-700">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Total Logs</p>
+                        <p class="text-2xl font-bold dark:text-white">{{ statistics.total }}</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border dark:border-gray-700">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Processed</p>
+                        <p class="text-2xl font-bold text-green-600">{{ statistics.processed }}</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border dark:border-gray-700">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Processing</p>
+                        <p class="text-2xl font-bold text-blue-600">{{ statistics.processing }}</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border dark:border-gray-700">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Pending</p>
+                        <p class="text-2xl font-bold text-yellow-600">{{ statistics.pending }}</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border dark:border-gray-700">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Failed</p>
+                        <p class="text-2xl font-bold text-red-600">{{ statistics.failed }}</p>
+                    </div>
+                </div>
+                
+                <!-- Table -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow">
                     <div class="p-6">
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -200,7 +233,7 @@ const retryProcessing = (id) => {
                         </div>
 
                         <!-- Pagination -->
-                        <div class="mt-6 flex justify-between items-center">
+                        <div v-if="networkLogs.links && networkLogs.data.length" class="mt-6 flex justify-between items-center">
                             <div class="text-sm text-gray-700 dark:text-gray-300">
                                 Showing {{ networkLogs.from }} to {{ networkLogs.to }} of {{ networkLogs.total }} results
                             </div>

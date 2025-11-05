@@ -43,4 +43,9 @@ class Alert extends Model
                     ->withPivot('assigned_at')
                     ->withTimestamps();
     }
+
+    public function investigations()
+    {
+        return $this->belongsToMany(Investigation::class, 'alert_investigation');
+    }
 }

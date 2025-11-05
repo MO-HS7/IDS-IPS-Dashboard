@@ -1,19 +1,48 @@
 <template>
     <Head title="Alerts" />
     <AuthenticatedLayout>
-        <template #header>
-            <div class="flex justify-between items-center">
-                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                    Security Alerts
-                </h2>
-                <Link :href="route('alerts.create')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Create New Alert
-                </Link>
-            </div>
-        </template>
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+        <div class="py-6">
+            <div class="max-w-7xl mx-auto px-6">
+                <!-- Header -->
+                <div class="mb-6 flex justify-between items-start">
+                    <div>
+                        <h1 class="text-2xl font-bold dark:text-white">🚨 Security Alerts</h1>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Manage and monitor security threat alerts</p>
+                    </div>
+                    <Link :href="route('alerts.create')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Create New Alert
+                    </Link>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-5 gap-4 mb-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border dark:border-gray-700">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Total Alerts</p>
+                        <p class="text-2xl font-bold dark:text-white">{{ statistics.total }}</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border dark:border-gray-700">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Critical</p>
+                        <p class="text-2xl font-bold text-red-600">{{ statistics.critical }}</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border dark:border-gray-700">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">High</p>
+                        <p class="text-2xl font-bold text-orange-600">{{ statistics.high }}</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border dark:border-gray-700">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Medium</p>
+                        <p class="text-2xl font-bold text-yellow-600">{{ statistics.medium }}</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border dark:border-gray-700">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Low</p>
+                        <p class="text-2xl font-bold text-green-600">{{ statistics.low }}</p>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow">
                     <div class="p-6">
                         <!-- Success Message -->
                         <div v-if="$page.props.flash?.success" class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
@@ -180,7 +209,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link, router } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const props = defineProps({
     alerts: {
@@ -188,6 +217,14 @@ const props = defineProps({
         required: true
     }
 })
+
+const statistics = computed(() => ({
+    total: props.alerts?.total || 0,
+    critical: props.alerts?.data?.filter(a => a.severity === 'critical').length || 0,
+    high: props.alerts?.data?.filter(a => a.severity === 'high').length || 0,
+    medium: props.alerts?.data?.filter(a => a.severity === 'medium').length || 0,
+    low: props.alerts?.data?.filter(a => a.severity === 'low').length || 0,
+}))
 
 const deletingId = ref(null)
 
